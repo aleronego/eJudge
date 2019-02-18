@@ -5,80 +5,79 @@ using namespace std;
 class Graph
 {
 int size;
-int *node;
+unsigned int *node;
 public:
+    //int count = 0;
     Graph(int);
     void addRel(int, int);
     void searchRel(int, int);
     int whereRoot(int);
-
-    void printNode()
-    {
-        //cerr << "\nNODES\n";
-        //for(int i = 0; i < size; ++i)
-            //cerr << node[i] << " ";
-        //cerr << "\n";
-    }
+    // void optimisation();
+    ~Graph() { delete[] node; }
 };
 
 Graph::Graph(int s) : size(s+1)
 {
-    node = new int[size]{0};
-    printNode();
+    node = new unsigned int[size]{0};
 }
 
 void Graph::addRel(int a, int b)
 {
     if(node[a] == 0 && node[b] == 0)
-        node[a] = node[b] = a;
+        node[a] = node[b] = (a<b?a:b);
     else if(node[a]==0)
-        node[a] = node[b];
+        node[a] = whereRoot( node[b] );
     else
-        node[b] = node[a];
+        node[b] = whereRoot( node[a] );
 }
 
 int Graph::whereRoot(int a)
 {
-    //cerr << "whereRoot " << a << endl;
+    //++count;
     if(node[a] == a)
         return a;
     else
-        return whereRoot(node[a]);
+    {
+        node[a] = whereRoot(node[a]);
+        //return whereRoot( node[a] );
+        return node[a];
+    }
 }
 
 void Graph::searchRel(int a, int b)
 {
-    //cerr << "\nStart search " << a << " " << b << endl;
-    //cerr << "node a " << node[a] << "\tnode b "<< node[b]<< endl;
     if(node[a] == 0 || node[b] == 0)
     {
-        //cerr << "if\n";
         cout << ":(\n";
     }
     else
     {
-        //cerr << "else\n";
         int tA = whereRoot(a);
         int tB = whereRoot(b);
-        ////cerr << tA << " " << tB << endl;
-        //f(node[a] ==  node[b])
         if(tA == tB)
             cout << ":)\n";
         else
             cout << ":(\n";
     }
-
-    //cerr << "\nEnd search " << a << " " << b << endl;
 }
 
+// void Graph::optimisation()
+// {
+//     cerr << "OPT\n";
+//     for(int i = 1; i < size; ++i)
+//     {
+//         if(node[i] != i)
+//         {
+//              node[i] = whereRoot(node[i]);
+//         }
+//     }
+//     cerr << "END OPT\n";
+// }
 
 int main(int argc, char const *argv[])
 {
-    int programmers, relationships; // M relationships
+    int programmers, relationships;  
     cin >> programmers >> relationships;
-
-    //cerr << "\nprogrammers " << programmers;
-    //cerr << "\nrelationships " << relationships << "\n";
 
     Graph g(programmers);
     for(int i = 0; i < relationships; ++i)
@@ -88,25 +87,15 @@ int main(int argc, char const *argv[])
         g.addRel(a,b);
     }
 
-    g.printNode();
+    // g.optimisation();
 
-    //cerr << "\nrequests\n";
     int requests;
     cin >> requests;
-
-    //cerr << requests << "\n";
 
     for(int i = 0; i < requests; ++i)
     {
         int a,b;
         cin >> a >> b;
-        //cerr << "\nReq: " << i << " " << a << " " << b << " ";
         g.searchRel(a,b);
-
-
-
-        //cerr << "\nEnd req " << i <<"\n";
     }
-    //cerr << "aaaaaaaaaaaa";
-    return 0;
 }
