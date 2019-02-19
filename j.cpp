@@ -7,16 +7,14 @@ class Graph
 int size;
 unsigned int *node;
 public:
-    //int count = 0;
     Graph(int);
     void addRel(int, int);
     void searchRel(int, int);
     int whereRoot(int);
-    // void optimisation();
     ~Graph() { delete[] node; }
 };
 
-Graph::Graph(int s) : size(s+1)
+Graph::Graph(int s) : size(++s)
 {
     node = new unsigned int[size]{0};
 }
@@ -27,19 +25,26 @@ void Graph::addRel(int a, int b)
         node[a] = node[b] = (a<b?a:b);
     else if(node[a]==0)
         node[a] = whereRoot( node[b] );
-    else
+    else if(node[b]==0)
         node[b] = whereRoot( node[a] );
+    else
+    {
+        cerr << "else"<< a << " " << b <<"\n";
+        int tA = whereRoot( node[a] );
+        int tB = whereRoot( node[b] );
+        int min = (tA<tB?tA:tB);
+        int max = (tA>tB?tA:tB);
+        node[max] = min;
+    }
 }
 
 int Graph::whereRoot(int a)
 {
-    //++count;
     if(node[a] == a)
         return a;
     else
     {
         node[a] = whereRoot(node[a]);
-        //return whereRoot( node[a] );
         return node[a];
     }
 }
@@ -61,19 +66,6 @@ void Graph::searchRel(int a, int b)
     }
 }
 
-// void Graph::optimisation()
-// {
-//     cerr << "OPT\n";
-//     for(int i = 1; i < size; ++i)
-//     {
-//         if(node[i] != i)
-//         {
-//              node[i] = whereRoot(node[i]);
-//         }
-//     }
-//     cerr << "END OPT\n";
-// }
-
 int main(int argc, char const *argv[])
 {
     int programmers, relationships;  
@@ -87,15 +79,32 @@ int main(int argc, char const *argv[])
         g.addRel(a,b);
     }
 
-    // g.optimisation();
-
     int requests;
     cin >> requests;
+    int **req = new int*[requests+1];
+    for(int i = 0; i < requests; ++i)
+        req[i]=new int[2];
+    
+    for(int i = 0; i < requests; ++i)
+    {
+        cin >> req[i][0] >> req[i][1];
+        
+    }
 
     for(int i = 0; i < requests; ++i)
     {
-        int a,b;
-        cin >> a >> b;
-        g.searchRel(a,b);
+        g.searchRel(req[i][0],req[i][1]);
     }
+
+    for(int i = 0; i < requests; ++i)
+        delete req[i];
+    delete[] req;
+
+    //slow variant
+    // for(int i = 0; i < requests; ++i)
+    // {
+    //     int a,b;
+    //     cin >> a >> b;
+    //     g.searchRel(a,b);
+    // }
 }
