@@ -14,7 +14,6 @@ public:
     void relations(int min, int max);
     void checkDep(int a, int b);
     void addDep( int a, int b);
-
 };
 
 TVshow::TVshow(int dep, int que) : maxDep(dep), quest(que)
