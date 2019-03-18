@@ -2,36 +2,79 @@
 #include <string>
 using namespace std;
 
-int maxDep, quest;//for addDep->relations
+class TVshow
+{
+int maxDep, quest; 
+int* arr;
+public:
+    TVshow(int,int);
+    ~TVshow();
+    void mainLoop();
+    int whereIsMyRoot(int r);
+    void relations(int min, int max);
+    void checkDep(int a, int b);
+    void addDep( int a, int b);
 
-int whereIsMyRoot(int* arr,int r)
+};
+
+TVshow::TVshow(int dep, int que) : maxDep(dep), quest(que)
+{
+    arr = new int[1000001];
+    for(int i = 0; i < 1000001; ++i)
+        arr[i] = 0;
+    
+    mainLoop();
+}
+TVshow::~TVshow()
+{
+    delete [] arr;
+}
+
+void TVshow::mainLoop()
+{
+    for(int q = 0; q < quest; ++q)
+    {
+        char op;
+        int a = 0; int b = 0;
+        cin >> op >> a >> b;
+        if(op=='?') { checkDep(a, b); }
+        else if(op=='U') { addDep(a, b); }
+        else {  cerr << "WUT\n"; return; }//WRONG WAY
+    }
+}
+
+
+int TVshow::whereIsMyRoot(int r)
 {
     if(arr[r] == r)
         return r;
     else 
-    {
-        arr[r] = whereIsMyRoot(arr, arr[r]);
-        return arr[r];
-    }
+        return whereIsMyRoot(arr[r]);
 }
-void relations(int* arr, int min, int max)
+
+void TVshow::relations(int min, int max)
 {
     for(int i = 1; i <= maxDep; ++i)
         if(arr[i]==max)
             arr[max]=min;
 }
 
-void checkDep(int* arr,int a, int b)
+void TVshow::checkDep(int a, int b)
 {
-    int ta = whereIsMyRoot(arr, a);
-    int tb = whereIsMyRoot(arr, b);
-    if(ta==tb)
-        cout << "MUSIC\n";
-    else 
+    if(arr[a] == 0 || arr[b] == 0)
         cout << "SHOW!\n";
+    else
+    {
+        int ta = whereIsMyRoot(a);
+        int tb = whereIsMyRoot(b);
+        if(ta==tb)
+            cout << "MUSIC\n";
+        else 
+            cout << "SHOW!\n";
+    }
 }
 
-void addDep(int* arr, int a, int b)
+void TVshow::addDep(int a, int b)
 {
     bool oneParty=false;
     if(arr[a] == 0 && arr[b] == 0)
@@ -48,16 +91,16 @@ void addDep(int* arr, int a, int b)
     }
     else
     {
-        int ta = whereIsMyRoot(arr, a);
-        int tb = whereIsMyRoot(arr, b);
+        int ta = whereIsMyRoot(a);
+        int tb = whereIsMyRoot(b);
         if(ta==tb)
             oneParty=true;
-        //else //?
-        int min = (ta<tb?ta:tb);
-        int max = (ta>tb?ta:tb);
-        arr[a]=arr[b] = min;
-
-        relations(arr, min, max);
+        else
+        {
+            int min = (ta<tb?ta:tb);
+            int max = (ta>tb?ta:tb);
+            arr[max]=min;
+        }
     }
 
     if(oneParty)
@@ -68,35 +111,8 @@ void addDep(int* arr, int a, int b)
 
 int main(int argc, char const *argv[])
 {
-    //cerr << "Begin!\n";
-    cin >> maxDep >> quest;
-    //int *arr = new int[maxDep+1];
-    int *arr = new int[1000001];
-    for(int i = 0; i < 1000001; ++i)
-        arr[i] = 0;
-
-    //cerr << "Start for" << endl;
-    for(int q = 0; q < quest; ++q)
-    {
-        char op;
-        int a = 0; int b = 0;
-        cin >> op >> a >> b;
-        ////cerr << "a " << a << " b " << b << " op " << op << "\n";
-
-        if(op=='?')
-        {
-            checkDep(arr,a, b);
-        }
-        else if(op=='U')
-        {
-            addDep(arr, a, b);
-        }
-        else { cerr << "WUT\n"; }
-        //for(int i = 1; i < maxDep+1; ++i)
-            //cerr << arr[i] << " ";
-        //cerr <<endl;
-    }
-
-    delete [] arr;
+    int dep, que;
+    cin >> dep >> que;
+    TVshow show(dep+1, que);
     return 0;
 }
