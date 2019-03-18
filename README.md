@@ -1,0 +1,1 @@
+Solved puzzles from eJudge
